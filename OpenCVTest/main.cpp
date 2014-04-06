@@ -5,6 +5,7 @@
 #include <iostream>
 #include "templateMatching.h"
 #include "TimeRecord.h"
+#include "RenderScene.h"
 
 using namespace std;
 using namespace cv;
@@ -15,10 +16,20 @@ string window_name = "Capture - Face detection";
 
 
 
-int main(){
+int main(int argc, char** argv){
+    
+    
+    RenderScene scene("3D Scene", 640, 480);
+    
+    scene.initialize(argc, argv);
+    
+    //TimeRecord recorder(496);
+    
+    
+    
+    return 0;
     
     TemplateCapture capture;
-    //TimeRecord recorder(496);
     
     bool pause = false;
     
@@ -29,6 +40,7 @@ int main(){
     //recorder.begin();
     for(;;){
         capture.run();
+        
         //if(recorder.addLap()) break;
         
         if(!capture.isOpened()) break;

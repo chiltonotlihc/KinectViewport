@@ -13,7 +13,7 @@ RenderScene *RenderScene::instance = NULL;
 
 
 RenderScene::RenderScene(){
-   windowTitle = "Window1";
+    windowTitle = "Window1";
     WINDOW_WIDTH = 200;
     WINDOW_HEIGHT = 200;
     position = 0;
@@ -37,6 +37,8 @@ RenderScene::RenderScene(std::string title, int width, int height){
     upVector.push_back(0.0);
     upVector.push_back(1.0);
     upVector.push_back(0.0);
+    
+    
     
     
 }
@@ -112,11 +114,13 @@ void RenderScene::displayScene(){
 
 void RenderScene::runScene(){
     
-    //animations go here.
+    capture.run();
+    capture.showWindow("Input");
+    eyeVector[0] = capture.getNormPositionX()*4;
+    eyeVector[1] = capture.getNormPositionY()*4;
+    std::cout << "Eye-x: " << eyeVector[0] << std::endl;
     
-    //position += 0.01;
     
-    if(position>4) position = 0;
     
     glutPostRedisplay();
 }

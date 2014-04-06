@@ -30,6 +30,7 @@ private:
     int totalFrames;
     
     cv::Point templatePosition;
+    cv::Point_<float> normTemplatePosition;
     cv::Point sourceSize;
     cv::Point templateSize;
     cv::Point mouseOffset;
@@ -69,8 +70,12 @@ public:
     inline cv::Mat getDepthData(){return scaledDepth;};
     inline cv::Mat getRgbData(){return rgbData;};
     
+    void showWindow(std::string name);
+    
     
     cv::Scalar calculateSAD(cv::Mat* source);
+    float getNormPositionX(){return normTemplatePosition.x;};
+    float getNormPositionY(){return normTemplatePosition.y;};
     void grabTemplate(cv::Mat* source);
     void mouseDown(int x, int y);
     void mouseUp();

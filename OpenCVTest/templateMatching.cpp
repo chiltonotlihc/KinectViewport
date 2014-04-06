@@ -10,7 +10,7 @@
 
 
 TemplateCapture::TemplateCapture(){
-    std::cout << "Constructor" << std::endl;
+    std::cout << "TemplateCapture Constructor" << std::endl;
     
     capture = cv::VideoCapture( CV_CAP_OPENNI );
     //capture = cv::VideoCapture("/Users/chiltonotlihc/UniWork/FYP/XcodeProjects/OpenCVTest/TestMedia.mov");
@@ -33,8 +33,6 @@ TemplateCapture::TemplateCapture(){
     templateSize.x = sourceSize.y/4;
     templateSize.y = sourceSize.x/4;
     
-    //templatePosition.x = 355-templateSize.x/2;
-    //templatePosition.y = 237-templateSize.y/2;
     
     faceDetected = false;
     templateCaptured = false;
@@ -110,10 +108,12 @@ void TemplateCapture::run(){
         
     }
     
-    
-    
-    
 
+}
+
+void TemplateCapture::showWindow(std::string name){
+    cv::imshow(name, rgbData);
+    
 }
 
 void TemplateCapture::drawTemplateSearchBox(){
@@ -276,10 +276,13 @@ cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
         
     }
     
-    std::cout << bestPosition.x << ", " << bestPosition.y << std::endl;
-    std::cout << SAD[0] << std::endl;
+    //std::cout << bestPosition.x << ", " << bestPosition.y << std::endl;
+    //std::cout << SAD[0] << std::endl;
     cv::rectangle(rgbData, cv::Rect(bestPosition.x, bestPosition.y, temp.cols, temp.rows), color);
     templatePosition = bestPosition;
+    
+    normTemplatePosition.x = -((float)templatePosition.x/(float)sourceSize.x)-1;
+    normTemplatePosition.y = -((float)templatePosition.y/(float)sourceSize.y);
     //imshow("BestMatch", cv::Mat(scaledDepth, cv::Rect(bestPosition.x, bestPosition.y, temp.cols, temp.rows)));
     
     return SAD;

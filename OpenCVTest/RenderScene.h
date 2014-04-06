@@ -15,6 +15,8 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
+#include "templateMatching.h"
+
 
 class RenderScene{
 private:
@@ -36,6 +38,7 @@ private:
     void renderLights();
     void setMatricies();
     
+    TemplateCapture capture;
     
     
 public:
