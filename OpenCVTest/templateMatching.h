@@ -1,0 +1,92 @@
+//
+//  templateMatching.h
+//  OpenCVTest
+//
+//  Created by Oliver Chilton on 09/12/2013.
+//  Copyright (c) 2013 Oliver Chilton. All rights reserved.
+//
+
+#ifndef __OpenCVTest__templateMatching__
+#define __OpenCVTest__templateMatching__
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/objdetect/objdetect.hpp"
+
+
+
+class TemplateCapture{
+private:
+    cv::VideoCapture capture;
+    cv::Mat rawDepth;
+    cv::Mat scaledDepth;
+    cv::Mat rgbData;
+    cv::Mat temp;
+    int currentFrame;
+    int totalFrames;
+    
+    cv::Point templatePosition;
+    cv::Point sourceSize;
+    cv::Point templateSize;
+    cv::Point mouseOffset;
+    cv::Point mouse;
+    cv::Scalar color;
+    
+    bool faceDetected;
+    bool templateCaptured;
+    bool ready;
+    bool movingBox;
+    
+    void drawTemplateSearchBox();
+    void detectFace(cv::Mat frame);
+    
+    
+    float bestSAD;
+    int searchStep;
+    float searchRadius;
+    
+    //Variables for accuracy testing
+    bool recordingAccuracy;
+    bool recordingTruthPoints;
+    std::vector<cv::Point> truthPoints;
+    std::vector<float> accuracyRecords;
+
+    //VJ Variables
+    cv::String face_cascade_name = "haarcascade_frontalface_alt.xml";
+    cv::String eyes_cascade_name = "haarcascade_eye_tree_eyeglasses.xml";
+    cv::CascadeClassifier face_cascade;
+    cv::CascadeClassifier eyes_cascade;
+    
+public:
+    TemplateCapture();
+    ~TemplateCapture();
+    void run();
+    
+    inline cv::Mat getDepthData(){return scaledDepth;};
+    inline cv::Mat getRgbData(){return rgbData;};
+    
+    
+    cv::Scalar calculateSAD();
+    void grabTemplate();
+    void mouseDown(int x, int y);
+    void mouseUp();
+    void mouseMoved(int x, int y);
+    bool isOpened();
+    
+    
+    //Methods for accuracy Testing
+    void setTruthPoints(std::vector<cv::Point> set);
+    void recordAccuracy();
+    
+    
+};
+
+
+
+
+
+#endif /* defined(__OpenCVTest__templateMatching__) */
