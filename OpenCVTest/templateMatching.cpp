@@ -52,6 +52,7 @@ TemplateCapture::TemplateCapture(){
     
     ready = true;
     
+    rgbPtr = &rgbData;
     
     
 }
@@ -92,21 +93,24 @@ void TemplateCapture::run(){
         //cv::waitKey(1);
     
         //currentFrame = floor(capture.get(CV_CAP_PROP_POS_FRAMES));
+        if(bestSAD>4000) faceDetected = false;
     
         if(templateCaptured){
-                calculateSAD();
+                calculateSAD(&rgbData);
         }else{
             if(faceDetected){
-                grabTemplate();
+                grabTemplate(&rgbData);
                 drawTemplateSearchBox();
             }else{
                 //detect thread on seperate thread
-                detectFace(rgbData);
+                detectFace(&rgbData);
             }
         }
         ready = false;
         
     }
+    
+    
     
     
 
@@ -157,7 +161,7 @@ void TemplateCapture::mouseDown(int x, int y){
         if(!templateCaptured){
             templatePosition.x = mouse.x-templateSize.x/2;
             templatePosition.y = mouse.y-templateSize.y/2;
-            grabTemplate();
+            grabTemplate(&rgbData);
         }
         recordAccuracy();
         
@@ -175,13 +179,13 @@ void TemplateCapture::mouseUp(){
 }
 
 
-void TemplateCapture::detectFace(cv::Mat frame){
+void TemplateCapture::detectFace(cv::Mat *frame){
     std::cout << "Detecting Face using VJ" << std::endl;
     
     std::vector<cv::Rect> faces;
     cv::Mat frame_gray;
     
-    cvtColor(frame, frame_gray, CV_BGR2GRAY);
+    cvtColor(*frame, frame_gray, CV_BGR2GRAY);
     cv::equalizeHist(frame_gray, frame_gray);
     
     face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0| CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
@@ -192,18 +196,17 @@ void TemplateCapture::detectFace(cv::Mat frame){
     
         std::cout << "found face at X: " << templatePosition.x << " Y: " << templatePosition.y << std::endl;
     
-        grabTemplate();
+        grabTemplate(frame);
     }
 
     
 }
 
-void TemplateCapture::grabTemplate(){
+void TemplateCapture::grabTemplate(cv::Mat* source){
     std::cout << "grabbing template at:" << templatePosition.y << std::endl;
-    std::cout << rgbData.size() << std::endl;
     
     //temp =  cv::Mat(rgbData, cv::Rect(templatePosition.x, templatePosition.y, templateSize.x, templateSize.y)).clone();
-    temp =  cv::Mat(scaledDepth, cv::Rect(templatePosition.x, templatePosition.y, templateSize.x, templateSize.y)).clone();
+    temp =  cv::Mat(*source, cv::Rect(templatePosition.x, templatePosition.y, templateSize.x, templateSize.y)).clone();
     //cv::imshow("template", temp);
     
     templateCaptured = true;
@@ -214,23 +217,21 @@ bool TemplateCapture::isOpened(){
     return capture.isOpened();
 }
 
-cv::Scalar TemplateCapture::calculateSAD(){
+cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
     cv::Mat difference;
     cv::Mat searchArea;
     cv::Scalar SAD(10000000000000);
     cv::Scalar total;
     cv::Point bestPosition(0, 0);
-    //int startX = (int) std::rand() % searchStep;
-    //int startY = (int) std::rand() % searchStep;
+
+    
     int limitX = sourceSize.x-templateSize.x;
     int limitY = sourceSize.y-templateSize.y;
     
     //calculate search limits
     int startX = templatePosition.x-(searchRadius*templateSize.x);
     int startY = templatePosition.y-(searchRadius*templateSize.y);
-    
-    //startX += int(std::rand() % searchStep);
-    //startY += int(std::rand() % searchStep);
+
     
     if(startX < 0) startX = 0;
     if(startY < 0) startY = 0;
@@ -254,7 +255,7 @@ cv::Scalar TemplateCapture::calculateSAD(){
             
             //searchArea = cv::Mat(rgbData, cv::Rect(x, y, temp.cols, temp.rows));
             
-            searchArea = cv::Mat(scaledDepth, cv::Rect(x, y, temp.cols, temp.rows));
+            searchArea = cv::Mat(*source, cv::Rect(x, y, temp.cols, temp.rows));
 
             difference = cv::abs(searchArea-temp);
             

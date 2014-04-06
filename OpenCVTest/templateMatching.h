@@ -42,7 +42,7 @@ private:
     bool movingBox;
     
     void drawTemplateSearchBox();
-    void detectFace(cv::Mat frame);
+    void detectFace(cv::Mat* frame);
     
     
     float bestSAD;
@@ -70,12 +70,13 @@ public:
     inline cv::Mat getRgbData(){return rgbData;};
     
     
-    cv::Scalar calculateSAD();
-    void grabTemplate();
+    cv::Scalar calculateSAD(cv::Mat* source);
+    void grabTemplate(cv::Mat* source);
     void mouseDown(int x, int y);
     void mouseUp();
     void mouseMoved(int x, int y);
     bool isOpened();
+    cv::Mat* rgbPtr;
     
     
     //Methods for accuracy Testing

@@ -37,7 +37,7 @@ int main(){
         imshow("depth", capture.getDepthData());
         
         if(waitKey(2) == 'c') break;
-        if(waitKey(2) == 's') capture.grabTemplate();
+        if(waitKey(2) == 's') capture.grabTemplate(capture.rgbPtr);
         if(waitKey(10) == 'p') pause = true;
         while(pause){
            if(waitKey(2) == 'p') pause = false;

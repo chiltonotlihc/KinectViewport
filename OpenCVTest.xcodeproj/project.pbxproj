@@ -251,12 +251,12 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				LIBRARY_SEARCH_PATHS = (
-					"/usr/local/**",
+					/usr/local/lib,
 					/opt/local/lib,
 				);
 				"OTHER_LDFLAGS[arch=*]" = "-v";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				"USER_HEADER_SEARCH_PATHS[arch=*]" = "/usr/local/**";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include;
 			};
 			name = Debug;
 		};
@@ -267,9 +267,10 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/local/lib,
+					/usr/local/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				"USER_HEADER_SEARCH_PATHS[arch=*]" = "/usr/local/**";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = /usr/local/include;
 			};
 			name = Release;
 		};
