@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A82D7387187DA32200A50948 /* TimeRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A82D7385187DA32200A50948 /* TimeRecord.cpp */; };
 		A84686941855F55200704D79 /* templateMatching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A84686921855F55200704D79 /* templateMatching.cpp */; };
+		A878BD5618F17E0500E843EF /* RenderScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A878BD5418F17E0500E843EF /* RenderScene.cpp */; };
 		A8A4702718290EC900432645 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A8A4702618290EC900432645 /* main.cpp */; };
 		A8A4702918290EC900432645 /* OpenCVTest.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = A8A4702818290EC900432645 /* OpenCVTest.1 */; };
 		A8A47036182910A500432645 /* libopencv_highgui.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A8A470321829105900432645 /* libopencv_highgui.2.4.6.dylib */; };
@@ -35,6 +36,8 @@
 		A82D7386187DA32200A50948 /* TimeRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeRecord.h; sourceTree = "<group>"; };
 		A84686921855F55200704D79 /* templateMatching.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = templateMatching.cpp; sourceTree = "<group>"; };
 		A84686931855F55200704D79 /* templateMatching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = templateMatching.h; sourceTree = "<group>"; };
+		A878BD5418F17E0500E843EF /* RenderScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RenderScene.cpp; path = ../../OpenGLScene/RenderScene.cpp; sourceTree = "<group>"; };
+		A878BD5518F17E0500E843EF /* RenderScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RenderScene.h; path = ../../OpenGLScene/RenderScene.h; sourceTree = "<group>"; };
 		A8A4702318290EC900432645 /* OpenCVTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenCVTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8A4702618290EC900432645 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A8A4702818290EC900432645 /* OpenCVTest.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = OpenCVTest.1; sourceTree = "<group>"; };
@@ -83,6 +86,8 @@
 		A8A4702518290EC900432645 /* OpenCVTest */ = {
 			isa = PBXGroup;
 			children = (
+				A878BD5418F17E0500E843EF /* RenderScene.cpp */,
+				A878BD5518F17E0500E843EF /* RenderScene.h */,
 				A8A4702618290EC900432645 /* main.cpp */,
 				A8A4702818290EC900432645 /* OpenCVTest.1 */,
 				A84686921855F55200704D79 /* templateMatching.cpp */,
@@ -157,6 +162,7 @@
 			files = (
 				A84686941855F55200704D79 /* templateMatching.cpp in Sources */,
 				A82D7387187DA32200A50948 /* TimeRecord.cpp in Sources */,
+				A878BD5618F17E0500E843EF /* RenderScene.cpp in Sources */,
 				A8A4702718290EC900432645 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
