@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A8125BBC18F45A2B00A6BC26 /* oc_utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A8125BBA18F45A2B00A6BC26 /* oc_utilities.cpp */; };
 		A82D7387187DA32200A50948 /* TimeRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A82D7385187DA32200A50948 /* TimeRecord.cpp */; };
 		A84686941855F55200704D79 /* templateMatching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A84686921855F55200704D79 /* templateMatching.cpp */; };
 		A878BD5818F17EC400E843EF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A878BD5718F17EC400E843EF /* OpenGL.framework */; };
@@ -34,6 +35,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A8125BBA18F45A2B00A6BC26 /* oc_utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oc_utilities.cpp; sourceTree = "<group>"; };
+		A8125BBB18F45A2B00A6BC26 /* oc_utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oc_utilities.h; sourceTree = "<group>"; };
 		A82D7385187DA32200A50948 /* TimeRecord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimeRecord.cpp; sourceTree = "<group>"; };
 		A82D7386187DA32200A50948 /* TimeRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeRecord.h; sourceTree = "<group>"; };
 		A84686921855F55200704D79 /* templateMatching.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = templateMatching.cpp; sourceTree = "<group>"; };
@@ -102,6 +105,8 @@
 				A84686931855F55200704D79 /* templateMatching.h */,
 				A82D7385187DA32200A50948 /* TimeRecord.cpp */,
 				A82D7386187DA32200A50948 /* TimeRecord.h */,
+				A8125BBA18F45A2B00A6BC26 /* oc_utilities.cpp */,
+				A8125BBB18F45A2B00A6BC26 /* oc_utilities.h */,
 			);
 			path = OpenCVTest;
 			sourceTree = "<group>";
@@ -170,6 +175,7 @@
 			files = (
 				A84686941855F55200704D79 /* templateMatching.cpp in Sources */,
 				A82D7387187DA32200A50948 /* TimeRecord.cpp in Sources */,
+				A8125BBC18F45A2B00A6BC26 /* oc_utilities.cpp in Sources */,
 				A878BD5D18F17FDD00E843EF /* RenderScene.cpp in Sources */,
 				A8A4702718290EC900432645 /* main.cpp in Sources */,
 			);

@@ -88,7 +88,6 @@ void TemplateCapture::run(){
         capture.retrieve(rgbData, CV_CAP_OPENNI_BGR_IMAGE);
         capture.retrieve(rawDepth, CV_CAP_OPENNI_DEPTH_MAP);
         rawDepth.convertTo(scaledDepth, CV_8UC1, 0.05f );
-        //cv::waitKey(1);
     
         //currentFrame = floor(capture.get(CV_CAP_PROP_POS_FRAMES));
        
@@ -211,7 +210,6 @@ void TemplateCapture::grabTemplate(cv::Mat* source){
     //cv::imshow("template", temp);
     
     templateCaptured = true;
-    imshow("template", temp);
     
 }
 
@@ -224,8 +222,8 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     cv::Mat result;
     result.create(source->rows-temp.rows+1, source->cols-temp.cols+1, CV_32FC1);
     
-    cv::matchTemplate(*source, temp, result, CV_TM_CCORR_NORMED);
-    cv::normalize( result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
+    cv::matchTemplate(*source, temp, result, CV_TM_CCORR);
+    cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
     
     double minVal, maxVal;
     cv::Point minLoc, maxLoc;
@@ -233,11 +231,12 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
     
     templatePosition = minLoc;
-    std::cout << templatePosition.x << std::endl;
-    std::cout << templatePosition.y << std::endl;
+    std::cout << "Min val: " << minVal << std::endl;
+    //templatePosition.x += temp.cols*0.5;
+
     convertToNormalPositions();
-    cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
-    //cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows), color);
+    //cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
+    cv::rectangle(rgbData, cv::Rect(templatePosition.x+(temp.cols*0.5), templatePosition.y, temp.cols, temp.rows), color);
     
 }
 
@@ -308,26 +307,33 @@ cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
     //convert into coordinates for rendering
     convertToNormalPositions();
     
-    std::cout << normTemplatePosition.z << std::endl;
     
     
     return SAD;
 }
 
 void TemplateCapture::convertToNormalPositions(){
- 
-    normTemplatePosition.x = 0.5-((float)templatePosition.x/(float)sourceSize.x);
-    normTemplatePosition.y = 0.5-((float)templatePosition.y/(float)sourceSize.y);
-    normTemplatePosition.z = getAverageDepth(cv::Mat(scaledDepth, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows)));
+    
+    normTemplatePosition.z = getAverageDepth(rawDepth, templatePosition);
+    
+    normTemplatePosition.x = (templatePosition.x - 339) * normTemplatePosition.z / 594.0;
+    normTemplatePosition.y = (templatePosition.y - 242) * normTemplatePosition.z / 591.0;
+    
+    
+    std::cout << "NormTemplate Z: " << normTemplatePosition.z << std::endl;
     
 }
 
-float TemplateCapture::getAverageDepth(cv::Mat mat){
+float TemplateCapture::getAverageDepth(cv::Mat mat, cv::Point p){
     
-    float size = mat.cols*mat.rows;
+    if(p.x + temp.cols > sourceSize.x) p.x = sourceSize.x - temp.cols;
+    if(p.y + temp.rows > sourceSize.y) p.y = sourceSize.y - temp.rows;
+    cv::Mat window = cv::Mat(mat, cv::Rect(p.x, p.y, temp.cols, temp.rows));
+    
+    float size = window.cols*window.rows;
     float oneOverSize = 1.0/size;
     
-    cv::Scalar tmp = cv::sum(mat);
+    cv::Scalar tmp = cv::sum(window);
     return tmp.mul(oneOverSize)[0];
     
 }

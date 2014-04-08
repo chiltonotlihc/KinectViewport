@@ -45,7 +45,7 @@ private:
     void convertToNormalPositions();
     void drawTemplateSearchBox();
     void detectFace(cv::Mat* frame);
-    float getAverageDepth(cv::Mat mat);
+    float getAverageDepth(cv::Mat mat, cv::Point p);
     
     
     float bestSAD;

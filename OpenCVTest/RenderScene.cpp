@@ -116,9 +116,9 @@ void RenderScene::runScene(){
     
     capture.run();
     capture.showWindow("Input");
-    eyeVector[0] = capture.getNormPositionX()*4;
-    eyeVector[1] = capture.getNormPositionY()*4;
-    eyeVector[2] = capture.getNormPositionZ()*0.5;
+    eyeVector[0] = capture.getNormPositionX();
+    eyeVector[1] = capture.getNormPositionY();
+    eyeVector[2] = capture.getNormPositionZ();
     std::cout << "Eye-x: " << eyeVector[0] << std::endl;
     
     
