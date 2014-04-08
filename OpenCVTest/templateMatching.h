@@ -30,7 +30,7 @@ private:
     int totalFrames;
     
     cv::Point templatePosition;
-    cv::Point_<float> normTemplatePosition;
+    cv::Point3_<float> normTemplatePosition;
     cv::Point sourceSize;
     cv::Point templateSize;
     cv::Point mouseOffset;
@@ -42,8 +42,10 @@ private:
     bool ready;
     bool movingBox;
     
+    void convertToNormalPositions();
     void drawTemplateSearchBox();
     void detectFace(cv::Mat* frame);
+    float getAverageDepth(cv::Mat mat);
     
     
     float bestSAD;
@@ -56,7 +58,7 @@ private:
     std::vector<cv::Point> truthPoints;
     std::vector<float> accuracyRecords;
 
-    //VJ Variables
+    //Viola Jones Variables
     cv::String face_cascade_name = "haarcascade_frontalface_alt.xml";
     cv::String eyes_cascade_name = "haarcascade_eye_tree_eyeglasses.xml";
     cv::CascadeClassifier face_cascade;
@@ -74,8 +76,10 @@ public:
     
     
     cv::Scalar calculateSAD(cv::Mat* source);
+    void matchTemplate(cv::Mat* source);
     float getNormPositionX(){return normTemplatePosition.x;};
     float getNormPositionY(){return normTemplatePosition.y;};
+    float getNormPositionZ(){return normTemplatePosition.z;};
     void grabTemplate(cv::Mat* source);
     void mouseDown(int x, int y);
     void mouseUp();

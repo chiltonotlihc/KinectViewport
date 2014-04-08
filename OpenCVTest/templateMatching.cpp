@@ -39,7 +39,7 @@ TemplateCapture::TemplateCapture(){
     movingBox = false;
     bestSAD = 100000000;
     searchStep = 8;
-    searchRadius = 0.25;
+    searchRadius = 0.5;
     
     recordingAccuracy = false;
     
@@ -91,19 +91,21 @@ void TemplateCapture::run(){
         //cv::waitKey(1);
     
         //currentFrame = floor(capture.get(CV_CAP_PROP_POS_FRAMES));
-        if(bestSAD>4000) faceDetected = false;
+       
     
         if(templateCaptured){
-                calculateSAD(&rgbData);
+            //calculateSAD(&scaledDepth);
+            matchTemplate(&scaledDepth);
         }else{
             if(faceDetected){
-                grabTemplate(&rgbData);
+                grabTemplate(&scaledDepth);
                 drawTemplateSearchBox();
             }else{
-                //detect thread on seperate thread
+                //detect face
                 detectFace(&rgbData);
             }
         }
+        //if(bestSAD>4000) faceDetected = false;
         ready = false;
         
     }
@@ -113,7 +115,6 @@ void TemplateCapture::run(){
 
 void TemplateCapture::showWindow(std::string name){
     cv::imshow(name, rgbData);
-    
 }
 
 void TemplateCapture::drawTemplateSearchBox(){
@@ -193,11 +194,11 @@ void TemplateCapture::detectFace(cv::Mat *frame){
     if(faces.size()>0){
         templatePosition.x = faces[0].x;
         templatePosition.y = faces[0].y;
-    
+        faceDetected = true;
         std::cout << "found face at X: " << templatePosition.x << " Y: " << templatePosition.y << std::endl;
-    
-        grabTemplate(frame);
     }
+    
+    
 
     
 }
@@ -210,11 +211,34 @@ void TemplateCapture::grabTemplate(cv::Mat* source){
     //cv::imshow("template", temp);
     
     templateCaptured = true;
+    imshow("template", temp);
     
 }
 
 bool TemplateCapture::isOpened(){
     return capture.isOpened();
+}
+
+void TemplateCapture::matchTemplate(cv::Mat* source){
+    
+    cv::Mat result;
+    result.create(source->rows-temp.rows+1, source->cols-temp.cols+1, CV_32FC1);
+    
+    cv::matchTemplate(*source, temp, result, CV_TM_CCORR_NORMED);
+    cv::normalize( result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
+    
+    double minVal, maxVal;
+    cv::Point minLoc, maxLoc;
+    
+    cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+    
+    templatePosition = minLoc;
+    std::cout << templatePosition.x << std::endl;
+    std::cout << templatePosition.y << std::endl;
+    convertToNormalPositions();
+    cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
+    //cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows), color);
+    
 }
 
 cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
@@ -225,8 +249,8 @@ cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
     cv::Point bestPosition(0, 0);
 
     
-    int limitX = sourceSize.x-templateSize.x;
-    int limitY = sourceSize.y-templateSize.y;
+    int limitX = source->cols-templateSize.x;
+    int limitY = source->rows-templateSize.y;
     
     //calculate search limits
     int startX = templatePosition.x-(searchRadius*templateSize.x);
@@ -277,15 +301,35 @@ cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
     }
     
     //std::cout << bestPosition.x << ", " << bestPosition.y << std::endl;
-    //std::cout << SAD[0] << std::endl;
+    std::cout << SAD[0] << std::endl;
     cv::rectangle(rgbData, cv::Rect(bestPosition.x, bestPosition.y, temp.cols, temp.rows), color);
     templatePosition = bestPosition;
     
-    normTemplatePosition.x = -((float)templatePosition.x/(float)sourceSize.x)-1;
-    normTemplatePosition.y = -((float)templatePosition.y/(float)sourceSize.y);
-    //imshow("BestMatch", cv::Mat(scaledDepth, cv::Rect(bestPosition.x, bestPosition.y, temp.cols, temp.rows)));
+    //convert into coordinates for rendering
+    convertToNormalPositions();
+    
+    std::cout << normTemplatePosition.z << std::endl;
+    
     
     return SAD;
+}
+
+void TemplateCapture::convertToNormalPositions(){
+ 
+    normTemplatePosition.x = 0.5-((float)templatePosition.x/(float)sourceSize.x);
+    normTemplatePosition.y = 0.5-((float)templatePosition.y/(float)sourceSize.y);
+    normTemplatePosition.z = getAverageDepth(cv::Mat(scaledDepth, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows)));
+    
+}
+
+float TemplateCapture::getAverageDepth(cv::Mat mat){
+    
+    float size = mat.cols*mat.rows;
+    float oneOverSize = 1.0/size;
+    
+    cv::Scalar tmp = cv::sum(mat);
+    return tmp.mul(oneOverSize)[0];
+    
 }
 
 void TemplateCapture::setTruthPoints(std::vector<cv::Point> set){
