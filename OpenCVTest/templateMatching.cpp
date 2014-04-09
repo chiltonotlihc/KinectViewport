@@ -30,8 +30,8 @@ TemplateCapture::TemplateCapture(){
     sourceSize.x = capture.get(CV_CAP_PROP_FRAME_WIDTH);
     sourceSize.y = capture.get(CV_CAP_PROP_FRAME_HEIGHT);
     
-    templateSize.x = sourceSize.y/4;
-    templateSize.y = sourceSize.x/4;
+    templateSize.x = sourceSize.y/3.5;
+    templateSize.y = sourceSize.x/3.5;
     
     
     faceDetected = false;
@@ -210,6 +210,8 @@ void TemplateCapture::grabTemplate(cv::Mat* source){
     //cv::imshow("template", temp);
     
     templateCaptured = true;
+    initTemplateDepth = cv::sum(temp)[0]/((float)temp.cols*(float)temp.rows);
+    
     
 }
 
@@ -219,24 +221,46 @@ bool TemplateCapture::isOpened(){
 
 void TemplateCapture::matchTemplate(cv::Mat* source){
     
+    //scale template according to current depth.
+    cv::Size newSize;
+    float depthDifference = normTemplatePosition.z-initTemplateDepth;
+    newSize.width = temp.cols / depthDifference * 594.0;
+    newSize.height = temp.rows / depthDifference * 591.0;
+    std::cout << newSize.width << std::endl;
+    
+    cv::Mat resizeTemp;
+    
+    if(newSize.width>0 && newSize.height>0){
+        resizeTemp.create(newSize.height+1, newSize.width+1, CV_32FC1);
+        cv::resize(temp, resizeTemp, newSize);
+    }else{
+        resizeTemp = temp;
+    }
+    
     cv::Mat result;
-    result.create(source->rows-temp.rows+1, source->cols-temp.cols+1, CV_32FC1);
+    try{
+        result.create(source->rows-resizeTemp.rows+1, source->cols-resizeTemp.cols+1, CV_32FC1);
     
-    cv::matchTemplate(*source, temp, result, CV_TM_CCORR);
-    cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
+        cv::matchTemplate(*source, resizeTemp, result, CV_TM_SQDIFF_NORMED);
+        cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
     
-    double minVal, maxVal;
-    cv::Point minLoc, maxLoc;
+        double minVal, maxVal;
+        cv::Point minLoc, maxLoc;
     
-    cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+        cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
     
-    templatePosition = minLoc;
-    std::cout << "Min val: " << minVal << std::endl;
-    //templatePosition.x += temp.cols*0.5;
+        templatePosition = minLoc;
+    
 
+        //templatePosition.x += temp.cols*0.5;
+        std::cout << "MinVal: " << minVal << std::endl;
+    }catch(std::exception e){
+        std::cout << "[Exception]" << e.what() << std::endl;
+        
+    }
     convertToNormalPositions();
     //cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
-    cv::rectangle(rgbData, cv::Rect(templatePosition.x+(temp.cols*0.5), templatePosition.y, temp.cols, temp.rows), color);
+    cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, newSize.width, newSize.height), color);
     
 }
 
@@ -319,8 +343,6 @@ void TemplateCapture::convertToNormalPositions(){
     normTemplatePosition.x = (templatePosition.x - 339) * normTemplatePosition.z / 594.0;
     normTemplatePosition.y = (templatePosition.y - 242) * normTemplatePosition.z / 591.0;
     
-    
-    std::cout << "NormTemplate Z: " << normTemplatePosition.z << std::endl;
     
 }
 

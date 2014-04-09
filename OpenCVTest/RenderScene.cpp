@@ -106,7 +106,7 @@ void RenderScene::displayScene(){
     
     glPushMatrix();
         glTranslatef(position, 0.0f, 0.0f);
-        glutSolidTeapot(3.5);
+        glutSolidTeapot(35);
     glPopMatrix();
     
     glutSwapBuffers();
@@ -118,8 +118,11 @@ void RenderScene::runScene(){
     capture.showWindow("Input");
     eyeVector[0] = capture.getNormPositionX();
     eyeVector[1] = capture.getNormPositionY();
-    eyeVector[2] = capture.getNormPositionZ();
+    //eyeVector[2] = -5;
+    eyeVector[2] = capture.getNormPositionZ()/10;
     std::cout << "Eye-x: " << eyeVector[0] << std::endl;
+    std::cout << "Eye-y: " << eyeVector[1] << std::endl;
+    std::cout << "Eye-z: " << eyeVector[2] << std::endl;
     
     
     

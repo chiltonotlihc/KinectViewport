@@ -12,11 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/objdetect/objdetect.hpp"
-
+#include <opencv2/opencv.hpp>
 
 
 class TemplateCapture{
@@ -26,6 +22,7 @@ private:
     cv::Mat scaledDepth;
     cv::Mat rgbData;
     cv::Mat temp;
+    float initTemplateDepth;
     int currentFrame;
     int totalFrames;
     
@@ -63,6 +60,9 @@ private:
     cv::String eyes_cascade_name = "haarcascade_eye_tree_eyeglasses.xml";
     cv::CascadeClassifier face_cascade;
     cv::CascadeClassifier eyes_cascade;
+    
+    //KalmanFilter
+    cv::KalmanFilter kmf;
     
 public:
     TemplateCapture();
