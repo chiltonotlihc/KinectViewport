@@ -12,7 +12,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/video/video.hpp>
 
 
 class TemplateCapture{
@@ -62,7 +65,8 @@ private:
     cv::CascadeClassifier eyes_cascade;
     
     //KalmanFilter
-    cv::KalmanFilter kmf;
+    cv::KalmanFilter KM;
+    cv::Mat_<float> measurement;
     
 public:
     TemplateCapture();

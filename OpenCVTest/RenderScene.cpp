@@ -74,12 +74,14 @@ void RenderScene::initialize(int argc, char**argv){
     
     glutDisplayFunc(displayWrapper);
     
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(1.0, 0.0, 0.0, 1.0);
     
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
+    
+    
     
     glutIdleFunc(runWrapper);
     
@@ -105,7 +107,9 @@ void RenderScene::displayScene(){
     
     
     glPushMatrix();
-        glTranslatef(position, 0.0f, 0.0f);
+
+    
+    glTranslatef(eyeVector[1], eyeVector[2], -500);
         glutSolidTeapot(35);
     glPopMatrix();
     
@@ -114,15 +118,17 @@ void RenderScene::displayScene(){
 
 void RenderScene::runScene(){
     
+    
     capture.run();
     capture.showWindow("Input");
     eyeVector[0] = capture.getNormPositionX();
     eyeVector[1] = capture.getNormPositionY();
-    //eyeVector[2] = -5;
     eyeVector[2] = capture.getNormPositionZ()/10;
+     
     std::cout << "Eye-x: " << eyeVector[0] << std::endl;
     std::cout << "Eye-y: " << eyeVector[1] << std::endl;
     std::cout << "Eye-z: " << eyeVector[2] << std::endl;
+    
     
     
     
@@ -143,9 +149,9 @@ void RenderScene::setMatricies(){
     
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
-    gluLookAt(eyeVector[0], eyeVector[1], eyeVector[2],
+    /*gluLookAt(eyeVector[0], eyeVector[1], eyeVector[2],
               centerVector[0], centerVector[1], centerVector[2],
-              upVector[0], upVector[1], upVector[2]);
+              upVector[0], upVector[1], upVector[2]);*/
 
 }
 
@@ -166,12 +172,32 @@ void RenderScene::renderLights(){
     
 }
 
+void RenderScene::displayTestScene(){
+
+    renderLights();
+    setMatricies();
+    
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    glBegin(GL_POLYGON);
+    glVertex2i(100,100);
+    glVertex2i(100,300);
+    glVertex2i(400,300);
+    glVertex2i(600,150);
+    glVertex2i(400,100);
+    glEnd();
+    glFlush();
+    
+    
+}
+
 
 
 
 // wrappers for callbacks
 void RenderScene::displayWrapper(){
     instance->displayScene();
+    //instance->displayTestScene();
 }
 
 void RenderScene::runWrapper(){

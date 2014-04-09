@@ -49,7 +49,9 @@ public:
     void initialize(int, char**);
     
     void displayScene();
+    void displayTestScene();
     void runScene();
+    
 
     
     void setEyePosition(float x, float y, float z);
