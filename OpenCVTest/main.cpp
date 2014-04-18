@@ -22,7 +22,7 @@ int main(int argc, char** argv){
     
     scene.initialize(argc, argv);
     
-    //TimeRecord recorder(496);
+
     
     
     

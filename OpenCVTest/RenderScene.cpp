@@ -101,7 +101,6 @@ void RenderScene::displayScene(){
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
-
     renderLights();
     setMatricies();
     
@@ -109,7 +108,7 @@ void RenderScene::displayScene(){
     glPushMatrix();
 
     
-    glTranslatef(eyeVector[1], eyeVector[2], -500);
+    //glTranslatef(eyeVector[1], eyeVector[2], -500);
         glutSolidTeapot(35);
     glPopMatrix();
     
@@ -120,17 +119,18 @@ void RenderScene::runScene(){
     
     
     capture.run();
-    capture.showWindow("Input");
     eyeVector[0] = capture.getNormPositionX();
     eyeVector[1] = capture.getNormPositionY();
-    eyeVector[2] = capture.getNormPositionZ()/10;
+    eyeVector[2] = capture.getNormPositionZ();
      
     std::cout << "Eye-x: " << eyeVector[0] << std::endl;
     std::cout << "Eye-y: " << eyeVector[1] << std::endl;
     std::cout << "Eye-z: " << eyeVector[2] << std::endl;
     
-    
-    
+    //hands.update(&capture);
+    capture.showRGB("Input");
+    capture.showDepth("Depth");
+    //capture.showMask("Mask");
     
     glutPostRedisplay();
 }
@@ -149,9 +149,9 @@ void RenderScene::setMatricies(){
     
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
-    /*gluLookAt(eyeVector[0], eyeVector[1], eyeVector[2],
+    gluLookAt(eyeVector[0], eyeVector[1], eyeVector[2],
               centerVector[0], centerVector[1], centerVector[2],
-              upVector[0], upVector[1], upVector[2]);*/
+              upVector[0], upVector[1], upVector[2]);
 
 }
 

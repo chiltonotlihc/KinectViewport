@@ -16,6 +16,7 @@
 #include <OpenGL/OpenGL.h>
 
 #include "templateMatching.h"
+#include "HandTracker.h"
 
 
 class RenderScene{
@@ -39,6 +40,7 @@ private:
     void setMatricies();
     
     TemplateCapture capture;
+    HandTracker hands;
     
     
 public:

@@ -24,6 +24,7 @@ private:
     cv::Mat rawDepth;
     cv::Mat scaledDepth;
     cv::Mat rgbData;
+    cv::Mat validMask;
     cv::Mat temp;
     float initTemplateDepth;
     int currentFrame;
@@ -33,6 +34,7 @@ private:
     cv::Point3_<float> normTemplatePosition;
     cv::Point sourceSize;
     cv::Point templateSize;
+    cv::Point templateSizeWorld;
     cv::Point mouseOffset;
     cv::Point mouse;
     cv::Scalar color;
@@ -67,6 +69,7 @@ private:
     //KalmanFilter
     cv::KalmanFilter KM;
     cv::Mat_<float> measurement;
+
     
 public:
     TemplateCapture();
@@ -75,8 +78,11 @@ public:
     
     inline cv::Mat getDepthData(){return scaledDepth;};
     inline cv::Mat getRgbData(){return rgbData;};
+    inline cv::Mat getMaskData(){return rgbData;};
     
-    void showWindow(std::string name);
+    void showRGB(std::string name);
+    void showDepth(std::string name);
+    void showMask(std::string name);
     
     
     cv::Scalar calculateSAD(cv::Mat* source);
