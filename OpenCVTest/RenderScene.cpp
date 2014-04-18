@@ -16,6 +16,8 @@ RenderScene::RenderScene(){
     windowTitle = "Window1";
     WINDOW_WIDTH = 200;
     WINDOW_HEIGHT = 200;
+    frameCount = 0;
+    previousTime = 0;
     position = 0;
 }
 
@@ -23,6 +25,8 @@ RenderScene::RenderScene(std::string title, int width, int height){
     windowTitle = title;
     WINDOW_WIDTH = width;
     WINDOW_HEIGHT = height;
+    frameCount = 0;
+    previousTime = 0;
     position = 0;
     
     //setup vectors
@@ -39,7 +43,7 @@ RenderScene::RenderScene(std::string title, int width, int height){
     upVector.push_back(0.0);
     
     
-    
+    hands.setCaptureObject(&capture);
     
 }
 
@@ -109,7 +113,7 @@ void RenderScene::displayScene(){
 
     
     //glTranslatef(eyeVector[1], eyeVector[2], -500);
-        glutSolidTeapot(35);
+    glutSolidTeapot(35);
     glPopMatrix();
     
     glutSwapBuffers();
@@ -127,10 +131,13 @@ void RenderScene::runScene(){
     std::cout << "Eye-y: " << eyeVector[1] << std::endl;
     std::cout << "Eye-z: " << eyeVector[2] << std::endl;
     
-    //hands.update(&capture);
+    //hands.update();
     capture.showRGB("Input");
     capture.showDepth("Depth");
     //capture.showMask("Mask");
+    
+    calculateFramerate();
+    std::cout << "Framerate: " << fps << std::endl;
     
     glutPostRedisplay();
 }
@@ -192,6 +199,24 @@ void RenderScene::displayTestScene(){
 }
 
 
+void RenderScene::calculateFramerate(){
+    
+    frameCount++;
+    
+    int currentTime = glutGet(GLUT_ELAPSED_TIME);
+    
+    int timeInterval = currentTime - previousTime;
+    
+    if(timeInterval > 1000){
+     
+        fps = frameCount / (timeInterval / 1000.0f);
+        
+        previousTime = currentTime;
+        
+        frameCount = 0;
+        
+    }
+}
 
 
 // wrappers for callbacks

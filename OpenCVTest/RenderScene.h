@@ -29,12 +29,16 @@ private:
     std::string windowTitle;
     int WINDOW_HEIGHT;
     int WINDOW_WIDTH;
+    int frameCount;
+    int previousTime;
+    float fps;
     float position;
     
     std::vector<float> eyeVector;
     std::vector<float> centerVector;
     std::vector<float> upVector;
     
+    void calculateFramerate();
     
     void renderLights();
     void setMatricies();

@@ -10,6 +10,7 @@
 		A8125BBC18F45A2B00A6BC26 /* oc_utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A8125BBA18F45A2B00A6BC26 /* oc_utilities.cpp */; };
 		A82D7387187DA32200A50948 /* TimeRecord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A82D7385187DA32200A50948 /* TimeRecord.cpp */; };
 		A838336C19012AFF0035734C /* HandTracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A838336A19012AFF0035734C /* HandTracker.cpp */; };
+		A838336F19017AAE0035734C /* ContourDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A838336D19017AAE0035734C /* ContourDef.cpp */; };
 		A84686941855F55200704D79 /* templateMatching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A84686921855F55200704D79 /* templateMatching.cpp */; };
 		A878BD5818F17EC400E843EF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A878BD5718F17EC400E843EF /* OpenGL.framework */; };
 		A878BD5A18F17ECD00E843EF /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A878BD5918F17ECD00E843EF /* GLUT.framework */; };
@@ -43,6 +44,8 @@
 		A82D7386187DA32200A50948 /* TimeRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeRecord.h; sourceTree = "<group>"; };
 		A838336A19012AFF0035734C /* HandTracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandTracker.cpp; sourceTree = "<group>"; };
 		A838336B19012AFF0035734C /* HandTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandTracker.h; sourceTree = "<group>"; };
+		A838336D19017AAE0035734C /* ContourDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ContourDef.cpp; sourceTree = "<group>"; };
+		A838336E19017AAE0035734C /* ContourDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContourDef.h; sourceTree = "<group>"; };
 		A84686921855F55200704D79 /* templateMatching.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = templateMatching.cpp; sourceTree = "<group>"; };
 		A84686931855F55200704D79 /* templateMatching.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = templateMatching.h; sourceTree = "<group>"; };
 		A878BD5718F17EC400E843EF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -134,6 +137,8 @@
 				A8125BBB18F45A2B00A6BC26 /* oc_utilities.h */,
 				A838336A19012AFF0035734C /* HandTracker.cpp */,
 				A838336B19012AFF0035734C /* HandTracker.h */,
+				A838336D19017AAE0035734C /* ContourDef.cpp */,
+				A838336E19017AAE0035734C /* ContourDef.h */,
 			);
 			path = OpenCVTest;
 			sourceTree = "<group>";
@@ -206,6 +211,7 @@
 				A8125BBC18F45A2B00A6BC26 /* oc_utilities.cpp in Sources */,
 				A878BD5D18F17FDD00E843EF /* RenderScene.cpp in Sources */,
 				A8A4702718290EC900432645 /* main.cpp in Sources */,
+				A838336F19017AAE0035734C /* ContourDef.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

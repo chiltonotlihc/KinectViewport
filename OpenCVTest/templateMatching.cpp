@@ -148,6 +148,8 @@ void TemplateCapture::run(){
             convertToNormalPositions();
             
         }else{
+            
+            //inefficient, change to move inline with report
             if(faceDetected){
                 grabTemplate(&scaledDepth);
                 drawTemplateSearchBox();
@@ -271,6 +273,9 @@ void TemplateCapture::detectFace(cv::Mat *frame){
         
     }
     
+    //added but not compiled and checked
+    grabTemplate(frame);
+    
 }
 
 void TemplateCapture::grabTemplate(cv::Mat* source){
@@ -324,6 +329,12 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     }else{
         resizeTemp = temp;
     }
+    
+
+    
+    //cv::rectangle(rgbData, cv::Rect(templatePosition.x-newSize.width/4, templatePosition.y - newSize.height/4, newSize.width*1.5, newSize.height*1.5), cv::Scalar(0, 200, 100));
+    
+
     
     cv::Mat result;
     try{
@@ -430,6 +441,7 @@ cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
 
 void TemplateCapture::convertToNormalPositions(){
     
+    //TODO: change this to allow for the adaptive resizing of the template
     normTemplatePosition.z = getAverageDepth(rawDepth, templatePosition);
     
     normTemplatePosition.x = (templatePosition.x - 339) * normTemplatePosition.z / 594.0;

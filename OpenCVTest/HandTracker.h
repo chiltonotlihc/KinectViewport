@@ -15,26 +15,39 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
 #include <opencv2/video/video.hpp>
-#include <OpenGL/OpenGL.h>
 
 #include "templateMatching.h"
+#include "ContourDef.h"
 
 
 class HandTracker{
 
 private:
-    float mThreshold, mBlobMin, mBlobMax;
-    float mKinectTilt;
+    float mThreshold;
     
-    cv::Mat mDepthTexture, mDepthSurface;
+    TemplateCapture* tempCap;
     
-    cv::Vec3f mTargetPosition;
+    std::vector<ContourDef> contours;
+    
+    
+    
+    
+    void processImage();
+    void findContours(cv::Mat input);
+
+    
     
 public:
     HandTracker();
+    HandTracker(TemplateCapture *ipCap);
     ~HandTracker();
     
-    void update(TemplateCapture* tempCap);
+    void setCaptureObject(TemplateCapture *ipCap);
+    
+    void update();
+    void newUpdate();
+    
+    void showContours();
     
     
     
