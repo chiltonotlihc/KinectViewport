@@ -67,12 +67,12 @@ TemplateCapture::TemplateCapture(){
     measurement.setTo(cv::Scalar(0));
     
     cv::setIdentity(KM.measurementMatrix);
-    setIdentity(KM.processNoiseCov, cv::Scalar::all(1e-4));
-    setIdentity(KM.measurementNoiseCov, cv::Scalar::all(1e-1));
-    setIdentity(KM.errorCovPost, cv::Scalar::all(.1));
+    cv::setIdentity(KM.processNoiseCov, cv::Scalar::all(5e-3));
+    cv::setIdentity(KM.measurementNoiseCov, cv::Scalar::all(1e-1));
+    cv::setIdentity(KM.errorCovPost, cv::Scalar::all(.1));
 
     
-    
+    bootTime = 10;
     
     
 }
@@ -111,16 +111,16 @@ void TemplateCapture::run(){
         capture.retrieve(rawDepth, CV_CAP_OPENNI_DEPTH_MAP);
         capture.retrieve(validMask, CV_CAP_OPENNI_VALID_DEPTH_MASK);
         rawDepth.convertTo(scaledDepth, CV_8UC1, 0.05f );
-
-
+    
         
         //use the mask to correct the scaledDepth image
-        cv::bitwise_not(validMask, validMask);
-        cv::bitwise_or(scaledDepth, 127, scaledDepth, validMask);
+        //cv::bitwise_not(validMask, validMask);
+        //cv::bitwise_or(scaledDepth, 127, scaledDepth, validMask);
         
     
         //currentFrame = floor(capture.get(CV_CAP_PROP_POS_FRAMES));
        
+        if(bootTime-- > 0) return;
     
         if(templateCaptured){
             //calculateSAD(&scaledDepth);
@@ -131,8 +131,8 @@ void TemplateCapture::run(){
             matchTemplate(&scaledDepth);
             
             //copy measurements into measurement Kalman filter matrix
-            measurement(0) = templatePosition.x;
-            measurement(1) = templatePosition.y;
+            measurement(0) = normTemplatePosition.x;
+            measurement(1) = normTemplatePosition.y;
             measurement(2) = normTemplatePosition.z;
             
             //compute the corrected values of measurement;
@@ -140,8 +140,8 @@ void TemplateCapture::run(){
             
             //copy measurement back into normTemplatePostion
             
-            templatePosition.x = estimated.at<float>(0, 0);
-            templatePosition.y = estimated.at<float>(1, 0);
+            normTemplatePosition.x = estimated.at<float>(0, 0);
+            normTemplatePosition.y = estimated.at<float>(1, 0);
             normTemplatePosition.z = estimated.at<float>(2, 0);
             
             
@@ -258,9 +258,12 @@ void TemplateCapture::detectFace(cv::Mat *frame){
     
     face_cascade.detectMultiScale(frame_gray, faces, 1.1, 2, 0| CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
     
-    cv::Point2f templateScale = {1, 1.5};
+    cv::Point2f templateScale = {1.1, 1.6};
     
     if(faces.size()>0){
+        
+        faceCenter.x = faces[0].x;
+        faceCenter.y = faces[0].y;
         
         templateSize.x = faces[0].width*templateScale.x;
         templateSize.y = faces[0].height*templateScale.y;
@@ -273,35 +276,32 @@ void TemplateCapture::detectFace(cv::Mat *frame){
         
     }
     
-    //added but not compiled and checked
-    grabTemplate(frame);
     
 }
 
 void TemplateCapture::grabTemplate(cv::Mat* source){
     std::cout << "Grabbing template at X:" << templatePosition.x << " Y: " << templatePosition.y << std::endl;
     
-    //temp =  cv::Mat(rgbData, cv::Rect(templatePosition.x, templatePosition.y, templateSize.x, templateSize.y)).clone();
+
     temp =  cv::Mat(*source, cv::Rect(templatePosition.x, templatePosition.y, templateSize.x, templateSize.y)).clone();
-    //cv::imshow("template", temp);
     
     templateCaptured = true;
     
-    
-    initTemplateDepth = getAverageDepth(rawDepth, templatePosition);
+    newSize = templateSize;
     
     convertToNormalPositions();
     
+    initTemplateDepth = normTemplatePosition.z;
     
-    KM.statePost.at<float>(3) = templatePosition.x;
-    KM.statePost.at<float>(4) = templatePosition.y;
+    std::cout << "initial depth: " << initTemplateDepth << std::endl;
+    
+    KM.statePost.at<float>(3) = normTemplatePosition.x;
+    KM.statePost.at<float>(4) = normTemplatePosition.y;
     KM.statePost.at<float>(5) = normTemplatePosition.z;
     
     //initialise world coordinates for the template
-    templateSizeWorld.x = templateSize.x * normTemplatePosition.z / 594.0;
-    templateSizeWorld.y = templateSize.y * normTemplatePosition.z / 591.0;
-    
-    std::cout << "init template world size : " << templateSizeWorld.x << std::endl;
+    templateSizeWorld.x = templateSize.x * initTemplateDepth / 594.0;
+    templateSizeWorld.y = templateSize.y * initTemplateDepth / 591.0;
     
     cv::imshow("Template", temp);
 }
@@ -311,36 +311,27 @@ bool TemplateCapture::isOpened(){
 }
 
 void TemplateCapture::matchTemplate(cv::Mat* source){
-    
-    //scale template according to current depth.
-    cv::Size newSize;
+
     
     //convert template world corrdinates back into image coordinates
     newSize.width = templateSizeWorld.x / normTemplatePosition.z * 594.0;
     newSize.height = templateSizeWorld.y / normTemplatePosition.z * 591.0;
     
+    std::cout << "New templateSize: " << newSize.width << std::endl;
     
     
-    cv::Mat resizeTemp;
     
-    if(newSize.width>0 && newSize.height>0){
-        resizeTemp.create(newSize.height+1, newSize.width+1, CV_32FC1);
-        cv::resize(temp, resizeTemp, newSize);
-    }else{
-        resizeTemp = temp;
-    }
+    cv::rectangle(rgbData, cv::Rect(templatePosition.x-newSize.width/4, templatePosition.y - newSize.height/4, newSize.width*1.5, newSize.height*1.5), cv::Scalar(0, 200, 100));
     
-
+    //cv::Mat newTemplate = cv::Mat(*source, cv::Rect(templatePosition.x-newSize.width/2, templatePosition.y-newSize.height/2, newSize.width, newSize.height));
     
-    //cv::rectangle(rgbData, cv::Rect(templatePosition.x-newSize.width/4, templatePosition.y - newSize.height/4, newSize.width*1.5, newSize.height*1.5), cv::Scalar(0, 200, 100));
-    
-
+    //source = &newTemplate;
     
     cv::Mat result;
     try{
-        result.create(source->rows-resizeTemp.rows+1, source->cols-resizeTemp.cols+1, CV_32FC1);
+        result.create(source->rows-temp.rows+1, source->cols-temp.cols+1, CV_32FC1);
     
-        cv::matchTemplate(*source, resizeTemp, result, CV_TM_SQDIFF_NORMED);
+        cv::matchTemplate(*source, temp, result, CV_TM_SQDIFF_NORMED);
         cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
     
         double minVal, maxVal;
@@ -354,9 +345,12 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
         //templatePosition.x += temp.cols*0.5;
         std::cout << "MinVal: " << minVal << std::endl;
     }catch(std::exception e){
-        std::cout << "[Exception]" << e.what() << std::endl;
+        //std::cout << "[Exception]" << e.what() << std::endl;
         
     }
+    
+    faceCenter = templatePosition + cv::Point(templateSize.x/2, templateSize.y/2);
+    
     convertToNormalPositions();
 
     
@@ -364,6 +358,7 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     //cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
     cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows), color);
     cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, newSize.width, newSize.height), cv::Scalar(255, 123, 7));
+    cv::ellipse(rgbData, faceCenter, cv::Size(10, 10), 0.0, 0.0, 360.0, cv::Scalar(100, 255, 60));
     
 }
 
@@ -442,21 +437,21 @@ cv::Scalar TemplateCapture::calculateSAD(cv::Mat* source){
 void TemplateCapture::convertToNormalPositions(){
     
     //TODO: change this to allow for the adaptive resizing of the template
-    normTemplatePosition.z = getAverageDepth(rawDepth, templatePosition);
+    normTemplatePosition.z = -getAverageDepth(rawDepth, faceCenter)*0.1;
     
-    normTemplatePosition.x = (templatePosition.x - 339) * normTemplatePosition.z / 594.0;
-    normTemplatePosition.y = (templatePosition.y - 242) * normTemplatePosition.z / 591.0;
+    normTemplatePosition.x = -(faceCenter.x - 339) * normTemplatePosition.z / 594.0;
+    normTemplatePosition.y = (faceCenter.y - 242) * normTemplatePosition.z / 591.0;
     
 
     
     
 }
 
-float TemplateCapture::getAverageDepth(cv::Mat mat, cv::Point p){
+float TemplateCapture::getAverageDepth(cv::Mat mat, cv::Point faceCenter){
     
-    if(p.x + temp.cols > sourceSize.x) p.x = sourceSize.x - temp.cols;
-    if(p.y + temp.rows > sourceSize.y) p.y = sourceSize.y - temp.rows;
-    cv::Mat window = cv::Mat(mat, cv::Rect(p.x, p.y, temp.cols, temp.rows));
+    cv::Size windowSize = {20, 20};
+
+    cv::Mat window = cv::Mat(mat, cv::Rect(faceCenter.x-windowSize.width, faceCenter.y-windowSize.height, windowSize.width, windowSize.height));
     
     float size = window.cols*window.rows;
     float oneOverSize = 1.0/size;

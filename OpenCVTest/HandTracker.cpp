@@ -13,7 +13,7 @@ HandTracker::HandTracker(){
     std::cout << "Constructing Hand Tracking Object" << std::endl;
     
     tempCap = NULL;
-    mThreshold = 70.0f;
+    mThreshold = 50.0f;
 
     
     
@@ -118,7 +118,8 @@ void HandTracker::update(){
     
     cv::Mat input = tempCap->getDepthData();
     
-    cv::Mat outputImage = tempCap->getRgbData();
+    cv::Mat outputImage;// = tempCap->getRgbData();
+    
     
     //set threshold value from current face distance
     //mThreshold = tempCap->getNormPositionZ()*0.1;
@@ -135,11 +136,16 @@ void HandTracker::update(){
     
     //threshold the blurred image into two seperate matricies
     cv::threshold( blurred, thresholded, mThreshold, 255, CV_THRESH_BINARY_INV);
+    cv::threshold( blurred, outputImage, mThreshold, 255, CV_THRESH_BINARY_INV);
     cv::threshold( blurred, thresholdedHands, mThreshold-20, 255, CV_THRESH_BINARY_INV);
     
+    cv::cvtColor(outputImage, outputImage, CV_GRAY2RGB);
+    
     imshow("Blurred", blurred);
-    imshow("Thresholded", thresholded);
-    imshow("ThresholdedHands", thresholdedHands);
+    //imshow("Thresholded", thresholded);
+    //imshow("ThresholdedHands", thresholdedHands);
+    
+    
     
     //2D vector of points to store contours
     std::vector<std::vector<cv::Point> > contours;
@@ -223,8 +229,7 @@ void HandTracker::update(){
        
     }
 
-    
-    
+    imshow("output", outputImage);
 }
 
 

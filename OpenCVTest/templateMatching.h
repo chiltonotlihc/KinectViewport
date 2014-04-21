@@ -30,10 +30,14 @@ private:
     int currentFrame;
     int totalFrames;
     
+    int bootTime;
+    
     cv::Point templatePosition;
+    cv::Point faceCenter;
     cv::Point3_<float> normTemplatePosition;
     cv::Point sourceSize;
     cv::Point templateSize;
+    cv::Size newSize;
     cv::Point templateSizeWorld;
     cv::Point mouseOffset;
     cv::Point mouse;
@@ -47,7 +51,7 @@ private:
     void convertToNormalPositions();
     void drawTemplateSearchBox();
     void detectFace(cv::Mat* frame);
-    float getAverageDepth(cv::Mat mat, cv::Point p);
+    float getAverageDepth(cv::Mat mat, cv::Point faceCenter);
     
     
     float bestSAD;

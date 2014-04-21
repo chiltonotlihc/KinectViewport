@@ -46,6 +46,9 @@ private:
     TemplateCapture capture;
     HandTracker hands;
     
+    int mouseX, mouseY;
+    
+    
     
 public:
     RenderScene();
@@ -56,9 +59,9 @@ public:
     
     void displayScene();
     void displayTestScene();
+    void drawSceneObjects();
     void runScene();
     
-
     
     void setEyePosition(float x, float y, float z);
     float getEyeX(){return eyeVector[0];};
@@ -66,6 +69,7 @@ public:
     
     static void displayWrapper();
     static void runWrapper();
+    static void mouseCallback(int x, int y);
     
 };
 
