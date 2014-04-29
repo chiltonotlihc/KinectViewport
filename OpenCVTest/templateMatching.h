@@ -25,6 +25,7 @@ private:
     cv::Mat scaledDepth;
     cv::Mat rgbData;
     cv::Mat validMask;
+    cv::Mat validDepth;
     cv::Mat temp;
     float initTemplateDepth;
     int currentFrame;
@@ -80,9 +81,11 @@ public:
     ~TemplateCapture();
     void run();
     
+    inline cv::Mat getRawDepth(){return rawDepth;};
     inline cv::Mat getDepthData(){return scaledDepth;};
+    inline cv::Mat getValidDepth(){return validDepth;};
     inline cv::Mat getRgbData(){return rgbData;};
-    inline cv::Mat getMaskData(){return rgbData;};
+    inline cv::Mat getMaskData(){return validMask;};
     
     void showRGB(std::string name);
     void showDepth(std::string name);

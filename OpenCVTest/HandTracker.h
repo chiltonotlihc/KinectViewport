@@ -45,9 +45,8 @@ public:
     void setCaptureObject(TemplateCapture *ipCap);
     
     void update();
-    void newUpdate();
     
-    void showContours();
+    void showContours(cv::Mat outputImage);
     
     
     

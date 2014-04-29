@@ -17,13 +17,14 @@
 #include <opencv2/video/video.hpp>
 
 class ContourDef{
-    
+private:
     std::vector<cv::Point> contourPoints;
     std::vector<cv::Point> hullPoints;
     std::vector<cv::Point> defectPoints;
     
     std::vector<cv::Vec4i> defectStructs;
     
+    void analyse();
     
     
 public:
@@ -32,7 +33,7 @@ public:
     ~ContourDef();
     
     void refresh(std::vector<cv::Point> newPoints);
-    void analyse();
+
     
     void showHullPoints(cv::Mat output);
     void showHullLines(cv::Mat output);
@@ -41,9 +42,11 @@ public:
     
     void showAll(cv::Mat output);
     
-    
     std::vector<cv::Point> getHullPoints();
     std::vector<cv::Point> getDefectPoints();
+    
+    
+    bool isOpenHand;
     
 };
 

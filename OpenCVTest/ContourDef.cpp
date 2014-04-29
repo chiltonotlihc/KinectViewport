@@ -28,27 +28,49 @@ ContourDef::~ContourDef(){
 
 void ContourDef::analyse(){
     
-    if(contourPoints.size() <= 3) return;
+    if(contourPoints.size() <= 100) return;
     
     //
     //  Detect Hull Points in the Contour
     //
     
         //Define sizes of the hullPoints vector
-        hullPoints = std::vector<cv::Point>( contourPoints.size() );
         std::vector<int> hullIdx;
         
-        //get coordinates of the hull points
-        cv::convexHull(contourPoints, hullPoints, false);
-        
+    
         //get indecies of the hull points in the contour
         cv::convexHull(contourPoints, hullIdx);
+        hullPoints.clear();
+    
+    
+        //Clean up Hull points when too close together
+        std::vector<int>::iterator hIdx = hullIdx.begin()+1;
+        cv::Point tempPoint1, tempPoint2;
+        for(; hIdx != hullIdx.end(); hIdx++){
+            tempPoint1 = contourPoints[*(hIdx-1)];
+            tempPoint2 = contourPoints[*hIdx];
+            
+            double distance = norm(tempPoint1 - tempPoint2);
+            
+            //if distance between points is small, remove first point
+            if(distance < 5.0){
+                hullIdx.erase(hIdx-1);
+                hIdx--;
+            }else{
+                //else, push point onto hullPoints vector
+                hullPoints.push_back(tempPoint2);
+                
+            }
+        
+        }
+    
     
     
     //
     //  Detect Defects in the Contour
     //
     
+
 
         //Detect the convexity defects
         cv::convexityDefects(contourPoints, hullIdx, defectStructs);
@@ -60,13 +82,20 @@ void ContourDef::analyse(){
     
         for(std::vector<cv::Vec4i>::iterator d = defectStructs.begin(); d<defectStructs.end(); d++){
             
-            int farIdx = (*d)[2];
+            //check that the defect point is greater than some distance
+            if((*d)[3]/265.0 < 20) continue;
             
-
+            
+            
+            //get the index of the point in the contour
+            int farIdx = (*d)[2];
             defectPoints.push_back(cv::Point(contourPoints[farIdx]));
 
             
         }
+    
+    isOpenHand = (defectPoints.size() >= 4);
+    
     
 }
 
@@ -79,8 +108,10 @@ void ContourDef::showAll(cv::Mat output){
 }
 
 void ContourDef::showContourLines(cv::Mat output){
-    
-    cv::Scalar color(255, 0, 0);
+    cv::Scalar color;
+    if(isOpenHand) {
+        color = cv::Scalar(0, 255, 0);
+    }else color = cv::Scalar(255, 0, 0);
     
     for(std::vector<cv::Point>::iterator c = contourPoints.begin()+1; c<contourPoints.end(); c++){
         

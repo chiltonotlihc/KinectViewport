@@ -145,8 +145,6 @@ void TemplateCapture::run(){
             normTemplatePosition.z = estimated.at<float>(2, 0);
             
             
-            convertToNormalPositions();
-            
         }else{
             
             //inefficient, change to move inline with report
@@ -164,86 +162,6 @@ void TemplateCapture::run(){
     }
     
 
-}
-
-void TemplateCapture::showRGB(std::string name){
-
-    cv::imshow(name, rgbData);
-
-}
-
-void TemplateCapture::showDepth(std::string name){
-    
-    cv::imshow(name, scaledDepth);
-    
-}
-
-void TemplateCapture::showMask(std::string name){
-    
-    cv::imshow(name, validMask);
-    
-}
-
-void TemplateCapture::drawTemplateSearchBox(){
-    if(movingBox) {
-        templatePosition = mouse+mouseOffset;
-    }
-    
-    cv::Point otherCorner = templatePosition+templateSize;
-    cv::rectangle(rgbData, templatePosition, otherCorner, color);
-    cv::rectangle(scaledDepth, templatePosition, otherCorner, color);
-   
-}
-
-void TemplateCapture::mouseMoved(int x, int y){
-    //std::cout << "mouse moved: " << x << ", " << y << std::endl;
-    if(!movingBox) return;
-    
-    mouse.x = x;
-    mouse.y = y;
-    
-}
-
-void TemplateCapture::mouseDown(int x, int y){
-    std::cout << "mouse down: " << x << ", " << y << std::endl;
-    mouse.x = x;
-    mouse.y = y;
-    if(!templateCaptured || false){
-        if(x>templatePosition.x && x<templatePosition.x+templateSize.x && y>templatePosition.y && y<templatePosition.y+templateSize.y){
-            //mouse was clicked inside box
-            color = cv::Scalar(50, 255, 50);
-            mouseOffset.x = templatePosition.x-x;
-            mouseOffset.y = templatePosition.y-y;
-            movingBox = true;
-        }
-         
-         
-    }
-    
-    if(recordingTruthPoints){
-        std::cout << "----------------------------- " << std::endl;
-        truthPoints.push_back(cv::Point(mouse.x-templateSize.x/2, mouse.y-templateSize.y/2));
-        std::cout << "Recorded Truth Point: " << mouse.x-templateSize.x/2 << ", " << mouse.y-templateSize.y/2 << std::endl;
-        ready = true;
-        
-        if(!templateCaptured){
-            templatePosition.x = mouse.x-templateSize.x/2;
-            templatePosition.y = mouse.y-templateSize.y/2;
-            grabTemplate(&rgbData);
-        }
-        recordAccuracy();
-        
-    }
-    
-}
-
-void TemplateCapture::mouseUp(){
-    //std::cout << "mouse up" << std::endl;
-    //mouse was released
-    color = cv::Scalar(255, 255, 255);
-
-    movingBox = false;
-    
 }
 
 
@@ -319,13 +237,7 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     
     std::cout << "New templateSize: " << newSize.width << std::endl;
     
-    
-    
-    cv::rectangle(rgbData, cv::Rect(templatePosition.x-newSize.width/4, templatePosition.y - newSize.height/4, newSize.width*1.5, newSize.height*1.5), cv::Scalar(0, 200, 100));
-    
-    //cv::Mat newTemplate = cv::Mat(*source, cv::Rect(templatePosition.x-newSize.width/2, templatePosition.y-newSize.height/2, newSize.width, newSize.height));
-    
-    //source = &newTemplate;
+
     
     cv::Mat result;
     try{
@@ -342,7 +254,7 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
         templatePosition = minLoc;
         std::cout << "Template-x: " << templatePosition.x << " Template-y: " << templatePosition.y << std::endl;
 
-        //templatePosition.x += temp.cols*0.5;
+        
         std::cout << "MinVal: " << minVal << std::endl;
     }catch(std::exception e){
         //std::cout << "[Exception]" << e.what() << std::endl;
@@ -357,7 +269,6 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     
     //cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
     cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows), color);
-    cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, newSize.width, newSize.height), cv::Scalar(255, 123, 7));
     cv::ellipse(rgbData, faceCenter, cv::Size(10, 10), 0.0, 0.0, 360.0, cv::Scalar(100, 255, 60));
     
 }
@@ -458,6 +369,87 @@ float TemplateCapture::getAverageDepth(cv::Mat mat, cv::Point faceCenter){
     
     cv::Scalar tmp = cv::sum(window);
     return tmp.mul(oneOverSize)[0];
+    
+}
+
+
+void TemplateCapture::showRGB(std::string name){
+    
+    cv::imshow(name, rgbData);
+    
+}
+
+void TemplateCapture::showDepth(std::string name){
+    
+    cv::imshow(name, scaledDepth);
+    
+}
+
+void TemplateCapture::showMask(std::string name){
+    
+    cv::imshow(name, validMask);
+    
+}
+
+void TemplateCapture::drawTemplateSearchBox(){
+    if(movingBox) {
+        templatePosition = mouse+mouseOffset;
+    }
+    
+    cv::Point otherCorner = templatePosition+templateSize;
+    cv::rectangle(rgbData, templatePosition, otherCorner, color);
+    cv::rectangle(scaledDepth, templatePosition, otherCorner, color);
+    
+}
+
+void TemplateCapture::mouseMoved(int x, int y){
+    //std::cout << "mouse moved: " << x << ", " << y << std::endl;
+    if(!movingBox) return;
+    
+    mouse.x = x;
+    mouse.y = y;
+    
+}
+
+void TemplateCapture::mouseDown(int x, int y){
+    std::cout << "mouse down: " << x << ", " << y << std::endl;
+    mouse.x = x;
+    mouse.y = y;
+    if(!templateCaptured || false){
+        if(x>templatePosition.x && x<templatePosition.x+templateSize.x && y>templatePosition.y && y<templatePosition.y+templateSize.y){
+            //mouse was clicked inside box
+            color = cv::Scalar(50, 255, 50);
+            mouseOffset.x = templatePosition.x-x;
+            mouseOffset.y = templatePosition.y-y;
+            movingBox = true;
+        }
+        
+        
+    }
+    
+    if(recordingTruthPoints){
+        std::cout << "----------------------------- " << std::endl;
+        truthPoints.push_back(cv::Point(mouse.x-templateSize.x/2, mouse.y-templateSize.y/2));
+        std::cout << "Recorded Truth Point: " << mouse.x-templateSize.x/2 << ", " << mouse.y-templateSize.y/2 << std::endl;
+        ready = true;
+        
+        if(!templateCaptured){
+            templatePosition.x = mouse.x-templateSize.x/2;
+            templatePosition.y = mouse.y-templateSize.y/2;
+            grabTemplate(&rgbData);
+        }
+        recordAccuracy();
+        
+    }
+    
+}
+
+void TemplateCapture::mouseUp(){
+    //std::cout << "mouse up" << std::endl;
+    //mouse was released
+    color = cv::Scalar(255, 255, 255);
+    
+    movingBox = false;
     
 }
 

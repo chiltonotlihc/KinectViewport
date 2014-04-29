@@ -168,22 +168,22 @@ void RenderScene::drawSceneObjects(){
 void RenderScene::runScene(){
     
     
-    //capture.run();
-    //eyeVector[0] = capture.getNormPositionX();
-    //eyeVector[1] = capture.getNormPositionY();
-    //eyeVector[2] = capture.getNormPositionZ();
+    capture.run();
+    eyeVector[0] = capture.getNormPositionX();
+    eyeVector[1] = capture.getNormPositionY();
+    eyeVector[2] = capture.getNormPositionZ();
     
     //eyeVector[0] = mouseX-WINDOW_WIDTH/2;
     
-    eyeVector[0] = 25;
-    eyeVector[1] = -5;
+    //eyeVector[0] = 25;
+    //eyeVector[1] = -5;
      
     std::cout << "Eye-x: " << eyeVector[0] << std::endl;
     std::cout << "Eye-y: " << eyeVector[1] << std::endl;
     std::cout << "Eye-z: " << eyeVector[2] << std::endl;
     
-    //hands.update();
-    //capture.showRGB("Input");
+    hands.update();
+    capture.showRGB("Input");
     //capture.showDepth("Depth");
     //capture.showMask("Mask");
     
@@ -199,6 +199,7 @@ void RenderScene::setMatricies(){
     
     int width = glutGet( GLUT_WINDOW_WIDTH );
     int height = glutGet( GLUT_WINDOW_HEIGHT );
+    
     float aspectRatio = width/height;
     glViewport( 0, 0, width, height );
     
@@ -221,8 +222,8 @@ void RenderScene::renderLights(){
     GLfloat light1_position[] = { -8.0, -10.0, -60.0, 0.0 };
     GLfloat white_light[] = { 1.0, 1.0, 1.0, 1.0 };
     GLfloat lmodel_ambient[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat ambient_light0[] = { 0.8, 0.6, 1.0, 0.5 };
-    GLfloat ambient_light1[] = { 0.6, 1.0, 0.2, 0.5 };
+    GLfloat ambient_light0[] = { 0.8, 0.8, 0.85, 0.5 };
+    GLfloat ambient_light1[] = { 0.3, 1.0, 0.2, 0.5 };
     
     glLightfv( GL_LIGHT0, GL_POSITION, light0_position );
     glLightfv( GL_LIGHT1, GL_POSITION, light1_position );
