@@ -16,6 +16,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/objdetect/objdetect.hpp"
 
+#include "templateMatching.h"
+
 
 
 class ImageSnap{
@@ -34,6 +36,30 @@ public:
     //void snap();
     void run();
     void show();
+    
+    
+};
+
+class SaveVideo{
+private:
+    cv::VideoCapture capture;
+    cv::VideoWriter writerRGB;
+    cv::VideoWriter writerRawDepth;
+    cv::VideoWriter writerValidMask;
+    
+    cv::FileStorage storage;
+    
+    cv::Mat rgb, rawDepth, validMask;
+    
+    std::string outputName;
+    
+    int frameCount;
+    
+public:
+    SaveVideo(std::string fileName);
+    ~SaveVideo();
+    
+    void run();
     
     
 };

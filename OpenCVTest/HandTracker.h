@@ -18,6 +18,11 @@
 
 #include "templateMatching.h"
 #include "ContourDef.h"
+#include "HandDef.h"
+
+#define HT_LEFT 0
+#define HT_RIGHT 1
+#define HT_BOTH -1
 
 
 class HandTracker{
@@ -27,14 +32,25 @@ private:
     
     TemplateCapture* tempCap;
     
-    std::vector<ContourDef> contours;
+    std::vector<ContourDef> leftContours;
+    std::vector<ContourDef> rightContours;
+    
+    HandDef leftHand;
+    HandDef rightHand;
     
     
+    
+    double* averageHu;
+    int averageCount;
+    
+    cv::Mat lMask;
     
     
     void processImage();
-    void findContours(cv::Mat input);
+    void findContours(cv::Mat input, std::vector<ContourDef>* contourVector, cv::Point offset);
+    void findHands();
 
+    void runningAverageHu(double* average, int* count);
     
     
 public:
@@ -46,7 +62,7 @@ public:
     
     void update();
     
-    void showContours(cv::Mat outputImage);
+    void showContours(cv::Mat outputImage, std::vector<ContourDef>* contourVector);
     
     
     

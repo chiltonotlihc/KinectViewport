@@ -22,6 +22,7 @@
 		A8A470381829297400432645 /* libopencv_core.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A8A470371829297400432645 /* libopencv_core.2.4.6.dylib */; };
 		A8A4703A1829299F00432645 /* libopencv_objdetect.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A8A470391829299F00432645 /* libopencv_objdetect.2.4.6.dylib */; };
 		A8A4703C182929EA00432645 /* libopencv_imgproc.2.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A8A4703B182929EA00432645 /* libopencv_imgproc.2.4.6.dylib */; };
+		A8BC554A19168DCB008AFB59 /* HandDef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A8BC554819168DCB008AFB59 /* HandDef.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -69,6 +70,8 @@
 		A8A470371829297400432645 /* libopencv_core.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.2.4.6.dylib; path = ../../../../../../usr/local/lib/libopencv_core.2.4.6.dylib; sourceTree = "<group>"; };
 		A8A470391829299F00432645 /* libopencv_objdetect.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_objdetect.2.4.6.dylib; path = ../../../../../../usr/local/lib/libopencv_objdetect.2.4.6.dylib; sourceTree = "<group>"; };
 		A8A4703B182929EA00432645 /* libopencv_imgproc.2.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgproc.2.4.6.dylib; path = ../../../../../../usr/local/lib/libopencv_imgproc.2.4.6.dylib; sourceTree = "<group>"; };
+		A8BC554819168DCB008AFB59 /* HandDef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HandDef.cpp; sourceTree = "<group>"; };
+		A8BC554919168DCB008AFB59 /* HandDef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandDef.h; sourceTree = "<group>"; };
 		A8FD78EA18B3959C00771211 /* libboost_system-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_system-mt.dylib"; path = "../../../../../../opt/local/lib/libboost_system-mt.dylib"; sourceTree = "<group>"; };
 		A8FD78EB18B3959C00771211 /* libboost_thread-mt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libboost_thread-mt.dylib"; path = "../../../../../../opt/local/lib/libboost_thread-mt.dylib"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -139,6 +142,8 @@
 				A838336B19012AFF0035734C /* HandTracker.h */,
 				A838336D19017AAE0035734C /* ContourDef.cpp */,
 				A838336E19017AAE0035734C /* ContourDef.h */,
+				A8BC554819168DCB008AFB59 /* HandDef.cpp */,
+				A8BC554919168DCB008AFB59 /* HandDef.h */,
 			);
 			path = OpenCVTest;
 			sourceTree = "<group>";
@@ -211,6 +216,7 @@
 				A8125BBC18F45A2B00A6BC26 /* oc_utilities.cpp in Sources */,
 				A878BD5D18F17FDD00E843EF /* RenderScene.cpp in Sources */,
 				A8A4702718290EC900432645 /* main.cpp in Sources */,
+				A8BC554A19168DCB008AFB59 /* HandDef.cpp in Sources */,
 				A838336F19017AAE0035734C /* ContourDef.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

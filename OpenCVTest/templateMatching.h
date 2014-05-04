@@ -51,6 +51,7 @@ private:
     
     void convertToNormalPositions();
     void drawTemplateSearchBox();
+    void drawFacePosition();
     void detectFace(cv::Mat* frame);
     float getAverageDepth(cv::Mat mat, cv::Point faceCenter);
     
@@ -86,6 +87,7 @@ public:
     inline cv::Mat getValidDepth(){return validDepth;};
     inline cv::Mat getRgbData(){return rgbData;};
     inline cv::Mat getMaskData(){return validMask;};
+    inline cv::Size getSourceSize(){return sourceSize;};
     
     void showRGB(std::string name);
     void showDepth(std::string name);

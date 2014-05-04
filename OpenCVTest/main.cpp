@@ -18,7 +18,7 @@ int main(int argc, char** argv){
     
     
     
-    RenderScene scene("3D Scene", 640, 480);
+    RenderScene scene("3D Scene", 1280, 800);
     
     scene.initialize(argc, argv);
     

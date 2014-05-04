@@ -10,19 +10,30 @@
 
 
 ContourDef::ContourDef(){
+    longestHullsIdx = new int[2];
+    longestHullsLength = new double[2];
     
+    huMoments = new double[8];
     
 }
 
 ContourDef::ContourDef(std::vector<cv::Point> initPoints){
+    longestHullsIdx = new int[2];
+    longestHullsLength = new double[2];
+    
+    huMoments = new double[8];
     
     contourPoints = initPoints;
     
     analyse();
+    //segmentHand();
 }
 
 ContourDef::~ContourDef(){
-
+    //delete longestHullsIdx;
+    //delete longestHullsLength;
+    
+    //delete[] huMoments;
     
 }
 
@@ -39,7 +50,7 @@ void ContourDef::analyse(){
         
     
         //get indecies of the hull points in the contour
-        cv::convexHull(contourPoints, hullIdx);
+        cv::convexHull(contourPoints, hullIdx, true);
         hullPoints.clear();
     
     
@@ -50,19 +61,21 @@ void ContourDef::analyse(){
             tempPoint1 = contourPoints[*(hIdx-1)];
             tempPoint2 = contourPoints[*hIdx];
             
-            double distance = norm(tempPoint1 - tempPoint2);
+            double distance = std::abs(cv::norm(tempPoint1 - tempPoint2));
             
             //if distance between points is small, remove first point
-            if(distance < 5.0){
+            if(distance < 5.0 && false){
                 hullIdx.erase(hIdx-1);
                 hIdx--;
             }else{
                 //else, push point onto hullPoints vector
-                hullPoints.push_back(tempPoint2);
+                hullPoints.push_back(tempPoint1);
                 
             }
         
         }
+    
+        hullPoints.push_back(*hullPoints.begin());
     
     
     
@@ -79,7 +92,8 @@ void ContourDef::analyse(){
         //Loop through list of defects and populate the defectPoints array
         defectPoints.clear();
     
-    
+        cv::Point defectAvg = {0, 0};
+    cv::Point tempPoint;
         for(std::vector<cv::Vec4i>::iterator d = defectStructs.begin(); d<defectStructs.end(); d++){
             
             //check that the defect point is greater than some distance
@@ -89,12 +103,98 @@ void ContourDef::analyse(){
             
             //get the index of the point in the contour
             int farIdx = (*d)[2];
-            defectPoints.push_back(cv::Point(contourPoints[farIdx]));
-
+            tempPoint = cv::Point(contourPoints[farIdx]);
+            defectPoints.push_back(tempPoint);
+            defectAvg+=tempPoint;
+            
             
         }
     
+    defectAvg = defectAvg * (1.0/defectPoints.size());
+
+    
+    
     isOpenHand = (defectPoints.size() >= 4);
+    
+    if(isOpenHand){
+        
+        handCenter = cv::Point(defectAvg);
+        
+    }else{
+        
+        cv::Scalar avg = cv::mean(contourPoints);
+        handCenter.x = avg[0];
+        handCenter.y = avg[1];
+    }
+    
+    
+    
+    
+    contourMoments = cv::moments(contourPoints, false);
+    cv::HuMoments(contourMoments, huMoments);
+    
+    /*
+    //std::cout << "Hu Moments:";
+    for(int i = 0 ; i<8; i++){
+        
+        std::cout << "\t" << huMoments[i];
+    }
+    std::cout << std::endl;
+     */
+    
+}
+
+void ContourDef::segmentHand(){
+
+    if(hullPoints.size()< 2) return;
+    
+    longestHullsLength[0] = -1;
+    longestHullsLength[1] = -1;
+    double length;
+    //loop thought the hull points
+    int counter = 0;
+    for(std::vector<cv::Point>::iterator h = hullPoints.begin()+1; h<hullPoints.end(); h++){
+        
+        //find absolute length
+        
+        length = std::abs(cv::norm(*h - *(h-1)));
+        
+        //put the longest lengths into the array
+        if(length > longestHullsLength[0]){
+            longestHullsLength[0] = length;
+            longestHullsIdx[0] = counter;
+        }else if(length > longestHullsLength[1]){
+            longestHullsLength[1] = length;
+            longestHullsIdx[1] = counter;
+        }
+        
+        counter++;
+    }
+    
+    
+    
+}
+
+double ContourDef::huDistance(double* moments){
+    
+    double total = 0;
+    double sum;
+    
+    try{
+        
+        for(int i = 0; i<8; i++){
+            sum = moments[i] - huMoments[i];
+            total += sum*sum;
+        }
+        
+        total = std::sqrt(total);
+        
+    }catch(std::exception e){
+        std::cerr << "[EXCEPTION] Array out of bounds" << std::endl;
+        return -1;
+    }
+    
+    return total;
     
     
 }
@@ -105,13 +205,29 @@ void ContourDef::showAll(cv::Mat output){
     showHullLines(output);
     showHullPoints(output);
     
+    cv::circle(output, handCenter, 10, cv::Scalar(255, 255, 100));
+    
+}
+
+void ContourDef::showContourFill(cv::Mat output){
+    cv::Scalar color;
+    if(isOpenHand) {
+        color = cv::Scalar(255, 255, 0);
+    }else color = cv::Scalar(255, 0, 255);
+    
+    std::vector<std::vector<cv::Point>> contours;
+    contours.push_back(contourPoints);
+    
+    cv::drawContours(output, contours, 0, color, -1);
+    
+    
 }
 
 void ContourDef::showContourLines(cv::Mat output){
     cv::Scalar color;
     if(isOpenHand) {
-        color = cv::Scalar(0, 255, 0);
-    }else color = cv::Scalar(255, 0, 0);
+        color = cv::Scalar(255, 255, 0);
+    }else color = cv::Scalar(255, 0, 255);
     
     for(std::vector<cv::Point>::iterator c = contourPoints.begin()+1; c<contourPoints.end(); c++){
         
@@ -139,10 +255,13 @@ void ContourDef::showDefectPoints(cv::Mat output){
 void ContourDef::showHullLines(cv::Mat output){
     
     cv::Scalar color(255, 0, 127);
-    
-    for(std::vector<cv::Point>::iterator h = hullPoints.begin()+1; h<hullPoints.end(); h++){
+    int counter = 0;
+    for(std::vector<cv::Point>::iterator h = hullPoints.begin()+1; h<hullPoints.end(); h++, counter++){
         
-        cv::line(output, *(h-1), *h, color);
+        if(counter == longestHullsIdx[0] || counter == longestHullsIdx[1]){
+            cv::line(output, *(h-1), *h, cv::Scalar(0, 255, 127));
+        }else
+            cv::line(output, *(h-1), *h, color);
         
     }
     

@@ -42,6 +42,7 @@ RenderScene::RenderScene(std::string title, int width, int height){
     upVector.push_back(1.0);
     upVector.push_back(0.0);
     
+    aspectRatio = width/height;
     
     hands.setCaptureObject(&capture);
     
@@ -151,7 +152,7 @@ void RenderScene::drawSceneObjects(){
     glPopMatrix();
     
     glTranslatef(0, 0, 50);
-    glScalef(1.0, 1.0, 4.0);
+    glScalef(aspectRatio, 1.0, 4.0);
     
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, whiteDiffuseMaterialArena);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, whiteSpecularMaterialArena);
@@ -178,17 +179,17 @@ void RenderScene::runScene(){
     //eyeVector[0] = 25;
     //eyeVector[1] = -5;
      
-    std::cout << "Eye-x: " << eyeVector[0] << std::endl;
-    std::cout << "Eye-y: " << eyeVector[1] << std::endl;
-    std::cout << "Eye-z: " << eyeVector[2] << std::endl;
+    //std::cout << "Eye-x: " << eyeVector[0] << std::endl;
+    //std::cout << "Eye-y: " << eyeVector[1] << std::endl;
+    //std::cout << "Eye-z: " << eyeVector[2] << std::endl;
     
     hands.update();
-    capture.showRGB("Input");
-    //capture.showDepth("Depth");
+    capture.showRGB("InputRGB");
+    capture.showDepth("Depth");
     //capture.showMask("Mask");
     
     calculateFramerate();
-    std::cout << "Framerate: " << fps << std::endl;
+    //std::cout << "Framerate: " << fps << std::endl;
     
     glutPostRedisplay();
 }
@@ -197,12 +198,10 @@ void RenderScene::runScene(){
 
 void RenderScene::setMatricies(){
     
-    int width = glutGet( GLUT_WINDOW_WIDTH );
-    int height = glutGet( GLUT_WINDOW_HEIGHT );
     
-    float aspectRatio = width/height;
-    glViewport( 0, 0, width, height );
-    
+
+    glViewport( 0, 0, WINDOW_WIDTH , WINDOW_HEIGHT );
+    //float fov = 2*atanf(WINDOW_HEIGHT/(2.0*eyeVector[2]));
     
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();

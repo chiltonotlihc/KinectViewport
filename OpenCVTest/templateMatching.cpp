@@ -67,7 +67,7 @@ TemplateCapture::TemplateCapture(){
     measurement.setTo(cv::Scalar(0));
     
     cv::setIdentity(KM.measurementMatrix);
-    cv::setIdentity(KM.processNoiseCov, cv::Scalar::all(5e-3));
+    cv::setIdentity(KM.processNoiseCov, cv::Scalar::all(5e-4));
     cv::setIdentity(KM.measurementNoiseCov, cv::Scalar::all(1e-1));
     cv::setIdentity(KM.errorCovPost, cv::Scalar::all(.1));
 
@@ -111,6 +111,8 @@ void TemplateCapture::run(){
         capture.retrieve(rawDepth, CV_CAP_OPENNI_DEPTH_MAP);
         capture.retrieve(validMask, CV_CAP_OPENNI_VALID_DEPTH_MASK);
         rawDepth.convertTo(scaledDepth, CV_8UC1, 0.05f );
+        
+        cv::blur(scaledDepth, scaledDepth, cv::Size(5, 5));
     
         
         //use the mask to correct the scaledDepth image
@@ -135,6 +137,8 @@ void TemplateCapture::run(){
             measurement(1) = normTemplatePosition.y;
             measurement(2) = normTemplatePosition.z;
             
+            
+            
             //compute the corrected values of measurement;
             cv::Mat estimated = KM.correct(measurement);
             
@@ -143,14 +147,13 @@ void TemplateCapture::run(){
             normTemplatePosition.x = estimated.at<float>(0, 0);
             normTemplatePosition.y = estimated.at<float>(1, 0);
             normTemplatePosition.z = estimated.at<float>(2, 0);
-            
+            drawFacePosition();
             
         }else{
             
             //inefficient, change to move inline with report
             if(faceDetected){
                 grabTemplate(&scaledDepth);
-                drawTemplateSearchBox();
             }else{
                 //detect face
                 detectFace(&rgbData);
@@ -207,11 +210,13 @@ void TemplateCapture::grabTemplate(cv::Mat* source){
     
     newSize = templateSize;
     
+    faceCenter = templatePosition + cv::Point(templateSize.x/2, templateSize.y/2);
+    
     convertToNormalPositions();
     
     initTemplateDepth = normTemplatePosition.z;
     
-    std::cout << "initial depth: " << initTemplateDepth << std::endl;
+    //std::cout << "initial depth: " << initTemplateDepth << std::endl;
     
     KM.statePost.at<float>(3) = normTemplatePosition.x;
     KM.statePost.at<float>(4) = normTemplatePosition.y;
@@ -235,7 +240,7 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     newSize.width = templateSizeWorld.x / normTemplatePosition.z * 594.0;
     newSize.height = templateSizeWorld.y / normTemplatePosition.z * 591.0;
     
-    std::cout << "New templateSize: " << newSize.width << std::endl;
+    //std::cout << "New templateSize: " << newSize.width << std::endl;
     
 
     
@@ -243,7 +248,7 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     try{
         result.create(source->rows-temp.rows+1, source->cols-temp.cols+1, CV_32FC1);
     
-        cv::matchTemplate(*source, temp, result, CV_TM_SQDIFF_NORMED);
+        cv::matchTemplate(*source, temp, result, CV_TM_CCOEFF_NORMED);
         cv::normalize(result, result, 0, 1, cv::NORM_MINMAX, -1, cv::Mat() );
     
         double minVal, maxVal;
@@ -251,25 +256,17 @@ void TemplateCapture::matchTemplate(cv::Mat* source){
     
         cv::minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
     
-        templatePosition = minLoc;
-        std::cout << "Template-x: " << templatePosition.x << " Template-y: " << templatePosition.y << std::endl;
-
+        templatePosition = maxLoc;
+        //std::cout << "Template-x: " << templatePosition.x << " Template-y: " << templatePosition.y << std::endl;
         
-        std::cout << "MinVal: " << minVal << std::endl;
     }catch(std::exception e){
         //std::cout << "[Exception]" << e.what() << std::endl;
         
     }
     
     faceCenter = templatePosition + cv::Point(templateSize.x/2, templateSize.y/2);
-    
     convertToNormalPositions();
 
-    
-    
-    //cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
-    cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows), color);
-    cv::ellipse(rgbData, faceCenter, cv::Size(10, 10), 0.0, 0.0, 360.0, cv::Scalar(100, 255, 60));
     
 }
 
@@ -389,6 +386,15 @@ void TemplateCapture::showMask(std::string name){
     
     cv::imshow(name, validMask);
     
+}
+
+void TemplateCapture::drawFacePosition(){
+    
+    faceCenter = templatePosition + cv::Point(templateSize.x/2, templateSize.y/2);
+    
+    //cv::rectangle(rgbData, cv::Rect(minLoc.x, minLoc.y, 2, 2), color);
+    cv::rectangle(rgbData, cv::Rect(templatePosition.x, templatePosition.y, temp.cols, temp.rows), color);
+    cv::ellipse(rgbData, faceCenter, cv::Size(10, 10), 0.0, 0.0, 360.0, cv::Scalar(100, 255, 60));
 }
 
 void TemplateCapture::drawTemplateSearchBox(){

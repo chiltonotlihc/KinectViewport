@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <vector>
+#include <exception>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
@@ -24,7 +25,16 @@ private:
     
     std::vector<cv::Vec4i> defectStructs;
     
+    cv::Moments contourMoments;
+    double *huMoments;
+    
+    int* longestHullsIdx;
+    double* longestHullsLength;
+    
     void analyse();
+    void segmentHand();
+    
+    cv::Point handCenter;
     
     
 public:
@@ -32,18 +42,23 @@ public:
     ContourDef(std::vector<cv::Point> initPoints);
     ~ContourDef();
     
-    void refresh(std::vector<cv::Point> newPoints);
+    void update(std::vector<cv::Point> newPoints);
+    
+    double huDistance(double* moments);
 
     
     void showHullPoints(cv::Mat output);
     void showHullLines(cv::Mat output);
     void showDefectPoints(cv::Mat output);
     void showContourLines(cv::Mat output);
+    void showContourFill(cv::Mat output);
     
     void showAll(cv::Mat output);
     
     std::vector<cv::Point> getHullPoints();
     std::vector<cv::Point> getDefectPoints();
+    
+    inline double* getHuMoments(){return huMoments;};
     
     
     bool isOpenHand;

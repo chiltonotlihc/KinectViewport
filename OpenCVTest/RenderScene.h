@@ -29,6 +29,7 @@ private:
     std::string windowTitle;
     int WINDOW_HEIGHT;
     int WINDOW_WIDTH;
+    float aspectRatio;
     int frameCount;
     int previousTime;
     float fps;
@@ -47,6 +48,7 @@ private:
     HandTracker hands;
     
     int mouseX, mouseY;
+
     
     
     
